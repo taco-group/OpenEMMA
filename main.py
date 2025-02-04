@@ -33,14 +33,14 @@ FUT_LEN = 10
 TTL_LEN = OBS_LEN + FUT_LEN
 
 def getMessage(prompt, image=None, args=None):
-    if "llama" in args.model_path:
+    if "Llama" in args.model_path:
         message = [
             {"role": "user", "content": [
                 {"type": "image"},
                 {"type": "text", "text": prompt}
             ]}
         ]
-    elif "qwen" in args.model_path:
+    elif "Qwen" in args.model_path:
         message = [
             {"role": "user", "content": [
                 {"type": "image", "image": image},
@@ -51,7 +51,7 @@ def getMessage(prompt, image=None, args=None):
 
 
 def vlm_inference(text=None, images=None, sys_message=None, processor=None, model=None, tokenizer=None, args=None):
-        if  "llama" in args.model_path:
+        if  "Llama" in args.model_path:
             image = Image.open(images).convert('RGB')
             message = getMessage(text, args=args)
             input_text = processor.apply_chat_template(message, add_generation_prompt=True)
@@ -66,11 +66,11 @@ def vlm_inference(text=None, images=None, sys_message=None, processor=None, mode
 
             output_text = processor.decode(output[0])
 
-            if "llama" in args.model_path:
+            if "Llama" in args.model_path:
                 output_text = re.findall(r'<\|start_header_id\|>assistant<\|end_header_id\|>(.*?)<\|eot_id\|>', output_text, re.DOTALL)[0].strip()
             return output_text
         
-        elif "qwen" in args.model_path:
+        elif "Qwen" in args.model_path:
             message = getMessage(text, image=images, args=args)
             text = processor.apply_chat_template(
                 message, tokenize=False, add_generation_prompt=True
@@ -248,22 +248,22 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     
-    if "llama" in args.model_path:
+    if "Llama" in args.model_path:
         model_id = "meta-llama/Llama-3.2-11B-Vision-Instruct"
         model = MllamaForConditionalGeneration.from_pretrained(
-            model_id,
+            args.model_path,
             torch_dtype=torch.bfloat16,
             device_map="auto",
         )
         processor = AutoProcessor.from_pretrained(model_id)
         tokenizer=None
-    elif "qwen" in args.model_path:
-        model = Qwen2VLForConditionalGeneration.from_pretrained("Qwen/Qwen2-VL-7B-Instruct", torch_dtype=torch.bfloat16, device_map="auto")
-        processor = AutoProcessor.from_pretrained("Qwen/Qwen2-VL-7B-Instruct")
+    elif "Qwen" in args.model_path:
+        model = Qwen2VLForConditionalGeneration.from_pretrained(args.model_path, torch_dtype=torch.bfloat16, device_map="auto")
+        processor = AutoProcessor.from_pretrained(args.model_path)
         tokenizer=None
     elif "llava" in args.model_path:
         disable_torch_init()
-        tokenizer, model, processor, context_len = load_pretrained_model("liuhaotian/llava-v1.6-mistral-7b", None, "llava-v1.6-mistral-7b")
+        tokenizer, model, processor, context_len = load_pretrained_model(args.model_path, None, "llava-v1.6-mistral-7b")
         image_token_se = DEFAULT_IM_START_TOKEN + DEFAULT_IMAGE_TOKEN + DEFAULT_IM_END_TOKEN
         
     else:
