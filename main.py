@@ -272,6 +272,10 @@ if __name__ == '__main__':
         model = Qwen2VLForConditionalGeneration.from_pretrained(args.model_path, torch_dtype=torch.bfloat16, device_map="auto")
         processor = AutoProcessor.from_pretrained(args.model_path)
         tokenizer=None
+    elif 'llava' == args.model_path:
+        disable_torch_init()
+        tokenizer, model, processor, context_len = load_pretrained_model("liuhaotian/llava-v1.6-mistral-7b", None, "llava-v1.6-mistral-7b")
+        image_token_se = DEFAULT_IM_START_TOKEN + DEFAULT_IMAGE_TOKEN + DEFAULT_IM_END_TOKEN
     elif "llava" in args.model_path:
         disable_torch_init()
         tokenizer, model, processor, context_len = load_pretrained_model(args.model_path, None, "llava-v1.6-mistral-7b")
