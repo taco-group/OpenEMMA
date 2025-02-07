@@ -247,6 +247,7 @@ if __name__ == '__main__':
     parser.add_argument("--method", type=str, default='openemma')
     args = parser.parse_args()
 
+    print(f"{args.model_path}")
     if "llama" in args.model_path:
         model_id = "meta-llama/Llama-3.2-11B-Vision-Instruct"
         model = MllamaForConditionalGeneration.from_pretrained(
@@ -262,7 +263,7 @@ if __name__ == '__main__':
             torch_dtype=torch.bfloat16,
             device_map="auto",
         )
-        processor = AutoProcessor.from_pretrained(model_id)
+        processor = AutoProcessor.from_pretrained(args.model_path)
         tokenizer=None
     elif "qwen" in args.model_path:
         model = Qwen2VLForConditionalGeneration.from_pretrained("Qwen/Qwen2-VL-7B-Instruct", torch_dtype=torch.bfloat16, device_map="auto")
@@ -295,6 +296,8 @@ if __name__ == '__main__':
 
     # Iterate the scenes
     scenes = nusc.scene
+    
+    print(f"Number of scenes: {len(scenes)}")
 
     for scene in scenes:
         token = scene['token']
