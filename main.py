@@ -33,14 +33,14 @@ FUT_LEN = 10
 TTL_LEN = OBS_LEN + FUT_LEN
 
 def getMessage(prompt, image=None, args=None):
-    if "llama" in args.model_path or "Llama" in args_model.path:
+    if "llama" in args.model_path or "Llama" in args.model_path:
         message = [
             {"role": "user", "content": [
                 {"type": "image"},
                 {"type": "text", "text": prompt}
             ]}
         ]
-    elif "qwen" in args.model_path or "Qwen" in args_model.path:
+    elif "qwen" in args.model_path or "Qwen" in args.model_path:
         message = [
             {"role": "user", "content": [
                 {"type": "image", "image": image},
@@ -51,7 +51,7 @@ def getMessage(prompt, image=None, args=None):
 
 
 def vlm_inference(text=None, images=None, sys_message=None, processor=None, model=None, tokenizer=None, args=None):
-        if "llama" in args.model_path or "Llama" in args_model.path:
+        if "llama" in args.model_path or "Llama" in args.model_path:
             image = Image.open(images).convert('RGB')
             message = getMessage(text, args=args)
             input_text = processor.apply_chat_template(message, add_generation_prompt=True)
@@ -66,11 +66,11 @@ def vlm_inference(text=None, images=None, sys_message=None, processor=None, mode
 
             output_text = processor.decode(output[0])
 
-            if "llama" in args.model_path or "Llama" in args_model.path:
+            if "llama" in args.model_path or "Llama" in args.model_path:
                 output_text = re.findall(r'<\|start_header_id\|>assistant<\|end_header_id\|>(.*?)<\|eot_id\|>', output_text, re.DOTALL)[0].strip()
             return output_text
         
-        elif "qwen" in args.model_path or "Qwen" in args_model.path:
+        elif "qwen" in args.model_path or "Qwen" in args.model_path:
             message = getMessage(text, image=images, args=args)
             text = processor.apply_chat_template(
                 message, tokenize=False, add_generation_prompt=True
