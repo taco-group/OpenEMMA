@@ -245,30 +245,30 @@ def OverlayTrajectory(img, points3d_world: list, cam_to_ego, ego_to_world, color
 
 def EstimateCurvatureFromTrajectory(traj):
     traj = traj[:, :2]
-
-    # Initialize curvature array
     curvature = np.zeros(len(traj))
 
-    # Compute curvature at each point (excluding the first and last)
     for i in range(1, len(traj) - 1):
-        x1, y1 = traj[i - 1][0], traj[i - 1][1]
-        x2, y2 = traj[i][0], traj[i][1]
-        x3, y3 = traj[i + 1][0], traj[i + 1][1]
+        x1, y1 = traj[i - 1]
+        x2, y2 = traj[i]
+        x3, y3 = traj[i + 1]
 
-        # Compute side lengths
-        L1 = np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
-        L2 = np.sqrt((x3 - x2) ** 2 + (y3 - y2) ** 2)
-        L3 = np.sqrt((x3 - x1) ** 2 + (y3 - y1) ** 2)
+        # Vectors
+        v1 = np.array([x2 - x1, y2 - y1])
+        v2 = np.array([x3 - x2, y3 - y2])
 
-        # Compute triangle area
-        area = 0.5 * np.abs(x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2))
+        # Lengths
+        L1 = np.linalg.norm(v1)
+        L2 = np.linalg.norm(v2)
+        L3 = np.linalg.norm(np.array([x3 - x1, y3 - y1]))
 
-        # Compute curvature
-        if L1 > 0 and L2 > 0 and L3 > 0:  # Avoid division by zero
-            curvature[i] = 4 * area / (L1 * L2 * L3)
+        # Signed area (using cross product)
+        area_signed = 0.5 * ((x2 - x1)*(y3 - y1) - (y2 - y1)*(x3 - x1))
 
-    curvature[0] = curvature[1]  # Set the first curvature to the second
-    curvature[-1] = curvature[-2]  # Set the last curvature to the second-to-last
+        if L1 > 0 and L2 > 0 and L3 > 0:
+            curvature[i] = 4 * area_signed / (L1 * L2 * L3)
+
+    curvature[0] = curvature[1]
+    curvature[-1] = curvature[-2]
 
     return curvature
 
